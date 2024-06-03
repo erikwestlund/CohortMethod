@@ -144,7 +144,8 @@ runCmAnalyses <- function(connectionDetails,
                           fitOutcomeModelThreads = 1,
                           outcomeCvThreads = 1,
                           outcomeIdsOfInterest,
-                          analysesToExclude = NULL) {
+                          analysesToExclude = NULL,
+                          skipModeling = FALSE) {
   if (!missing(outcomeIdsOfInterest) && !is.null(outcomeIdsOfInterest) && refitPsForEveryOutcome) {
     stop("Cannot have both outcomeIdsOfInterest and refitPsForEveryOutcome set to TRUE")
   }
@@ -252,6 +253,11 @@ runCmAnalyses <- function(connectionDetails,
     ParallelLogger::clusterRequire(cluster, "CohortMethod")
     dummy <- ParallelLogger::clusterApply(cluster, objectsToCreate, createStudyPopObject)
     ParallelLogger::stopCluster(cluster)
+  }
+
+  if(skipModeling) {
+    ParallelLogger::logInfo("*** Skipping CohortMethod modeling procedures. ***")
+    return()
   }
 
   if (refitPsForEveryOutcome) {
